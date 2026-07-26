@@ -43,6 +43,8 @@ async def analyze_document(
     Si se provee URL, se descarga y extrae el texto de la página.
     Si se provee archivo, se extrae según su formato.
 
+    Prioridad: URL > File (si ambos están presentes, se usa URL).
+
     Args:
         file: Archivo subido por el usuario (opcional si se provee url).
         url: URL de página web a analizar (opcional si se provee file).
@@ -55,10 +57,18 @@ async def analyze_document(
     extracted_text = None
 
     try:
-        if url and url.strip():
-            # --- Flujo URL ---
+        # Determinar modo de entrada
+        has_url = url is not None and url.strip() != ""
+        has_file = (
+            file is not None
+            and file.filename is not None
+            and file.filename.strip() != ""
+        )
+
+        if has_url:
+            # --- Flujo URL (prioridad sobre file) ---
             extracted_text = _extract_from_url(url.strip())
-        elif file and file.filename:
+        elif has_file:
             # --- Flujo archivo ---
             extracted_text = await _extract_from_file(file, settings)
         else:
@@ -82,19 +92,7 @@ async def analyze_document(
 
 
 async def _extract_from_file(file: UploadFile, settings) -> str:
-    """Extrae texto de un archivo subido.
-
-    Args:
-        file: Archivo subido.
-        settings: Configuración de la app.
-
-    Returns:
-        Texto extraído del archivo.
-
-    Raises:
-        InvalidFormatException: Si la extensión no es soportada.
-        FileTooLargeException: Si el archivo excede el límite.
-    """
+    """Extrae texto de un archivo subido."""
     filename = file.filename or ""
     ext = os.path.splitext(filename)[1].lower()
     if ext not in _ALLOWED_EXTENSIONS:
@@ -109,16 +107,6 @@ async def _extract_from_file(file: UploadFile, settings) -> str:
 
 
 def _extract_from_url(url: str) -> str:
-    """Extrae texto de una URL web.
-
-    Args:
-        url: URL de la página a analizar.
-
-    Returns:
-        Texto extraído de la página.
-
-    Raises:
-        ExtractionError: Si la URL no puede descargarse o parsearse.
-    """
+    """Extrae texto de una URL web."""
     web_extractor = get_web_extractor()
     return web_extractor.extract(url)

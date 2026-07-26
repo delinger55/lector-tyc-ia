@@ -290,3 +290,52 @@ class TestE2EFullFlowVerification:
         )
         assert response.status_code == 400
         assert "application/json" in response.headers["content-type"]
+
+
+class TestE2EUrlFlow:
+    """Tests E2E para análisis por URL."""
+
+    async def test_url_via_form_data(self, client: AsyncClient):
+        """URL enviada via form data (como lo hace el browser en modo URL)."""
+        response = await client.post(
+            "/api/v1/analyze",
+            data={"url": "not-a-valid-url"},
+        )
+        # Debe llegar al WebUrlExtractor y fallar con CORRUPT_FILE (URL inválida)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error_code"] == "CORRUPT_FILE"
+
+    async def test_url_invalid_protocol(self, client: AsyncClient):
+        """URL sin http/https llega al extractor y falla."""
+        response = await client.post(
+            "/api/v1/analyze",
+            data={"url": "ftp://example.com/terms"},
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error_code"] == "CORRUPT_FILE"
+
+    async def test_url_field_empty_falls_to_invalid_format(self, client: AsyncClient):
+        """URL vacía sin archivo → INVALID_FORMAT."""
+        response = await client.post(
+            "/api/v1/analyze",
+            data={"url": ""},
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error_code"] == "INVALID_FORMAT"
+
+    async def test_url_has_priority_when_both_present(self, client: AsyncClient):
+        """Cuando URL y file están presentes, URL tiene prioridad."""
+        # Enviar ambos: file válido + url inválida → URL se procesa primero
+        txt_content = ("Texto de prueba suficiente. " * 10).encode("utf-8")
+        response = await client.post(
+            "/api/v1/analyze",
+            data={"url": "not-valid"},
+            files={"file": ("terms.txt", txt_content, "text/plain")},
+        )
+        # URL tiene prioridad → CORRUPT_FILE (no procesa el file)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error_code"] == "CORRUPT_FILE"
