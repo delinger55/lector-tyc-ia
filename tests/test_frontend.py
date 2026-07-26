@@ -116,3 +116,11 @@ class TestFrontendHTML:
         html = response.text
         assert '/static/css/styles.css' in html
         assert '/static/js/app.js' in html
+
+    async def test_contains_theme_toggle_button(self, client: AsyncClient):
+        """HTML contiene el botón toggle de tema (dark mode)."""
+        response = await client.get("/")
+        html = response.text
+        assert 'id="theme-toggle"' in html
+        assert "icon-sun" in html
+        assert "icon-moon" in html

@@ -247,9 +247,59 @@
         setState(State.UPLOAD);
     }
 
+    // --- Theme toggle (Dark Mode) ---
+
+    function getPreferredTheme() {
+        var stored = localStorage.getItem('theme');
+        if (stored) {
+            return stored;
+        }
+        // Respetar preferencia del sistema
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+        }
+        return 'light';
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    function toggleTheme() {
+        var current = document.documentElement.getAttribute('data-theme');
+        var newTheme = current === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    }
+
+    function setupThemeToggle() {
+        // Aplicar tema al cargar
+        applyTheme(getPreferredTheme());
+
+        // Escuchar click en el botón
+        var btn = document.getElementById('theme-toggle');
+        if (btn) {
+            btn.addEventListener('click', toggleTheme);
+        }
+
+        // Escuchar cambios en preferencia del sistema
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+    }
+
     // --- Inicialización ---
 
     function init() {
+        setupThemeToggle();
         setupDragAndDrop();
 
         elements.fileInput.addEventListener('change', handleFileSelected);
