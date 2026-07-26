@@ -35,11 +35,11 @@ class TestFrontendHTML:
         assert "no constituye asesoría legal profesional" in html
 
     async def test_contains_file_input(self, client: AsyncClient):
-        """HTML contiene input type=file con accept .pdf,.docx."""
+        """HTML contiene input type=file con accept .pdf,.docx,.txt."""
         response = await client.get("/")
         html = response.text
         assert 'type="file"' in html
-        assert 'accept=".pdf,.docx"' in html
+        assert 'accept=".pdf,.docx,.txt"' in html
 
     async def test_contains_three_state_sections(self, client: AsyncClient):
         """HTML contiene las 3 secciones de estado."""
@@ -124,3 +124,26 @@ class TestFrontendHTML:
         assert 'id="theme-toggle"' in html
         assert "icon-sun" in html
         assert "icon-moon" in html
+
+    async def test_contains_input_tabs(self, client: AsyncClient):
+        """HTML contiene las pestañas de archivo y URL."""
+        response = await client.get("/")
+        html = response.text
+        assert 'id="tab-file"' in html
+        assert 'id="tab-url"' in html
+        assert "Subir archivo" in html
+        assert "Ingresar URL" in html
+
+    async def test_contains_url_input_field(self, client: AsyncClient):
+        """HTML contiene el campo de entrada de URL."""
+        response = await client.get("/")
+        html = response.text
+        assert 'id="url-input"' in html
+        assert 'type="url"' in html
+
+    async def test_contains_txt_format_badge(self, client: AsyncClient):
+        """HTML contiene el badge de formato .TXT."""
+        response = await client.get("/")
+        html = response.text
+        assert ".TXT" in html
+        assert "format-badge--txt" in html

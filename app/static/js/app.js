@@ -1,6 +1,6 @@
 /**
  * Lector de Términos y Condiciones con IA
- * Gestión de estados, fetch API, drag-and-drop y renderizado de resultados.
+ * Gestión de estados, fetch API, drag-and-drop, tabs y renderizado de resultados.
  */
 
 (function () {
@@ -12,6 +12,13 @@
         PROCESSING: 'processing',
         RESULTS: 'results',
     };
+
+    const InputMode = {
+        FILE: 'file',
+        URL: 'url',
+    };
+
+    var currentInputMode = InputMode.FILE;
 
     // --- Referencias al DOM ---
     const elements = {
@@ -30,17 +37,21 @@
         summaryList: document.getElementById('summary-list'),
         riskClausesContainer: document.getElementById('risk-clauses-container'),
         noRisksMessage: document.getElementById('no-risks-message'),
+        // Tabs
+        tabFile: document.getElementById('tab-file'),
+        tabUrl: document.getElementById('tab-url'),
+        panelFile: document.getElementById('panel-file'),
+        panelUrl: document.getElementById('panel-url'),
+        urlInput: document.getElementById('url-input'),
     };
 
     // --- Gestión de estados ---
 
     function setState(newState) {
-        // Ocultar todas las secciones
         elements.stateUpload.classList.add('hidden');
         elements.stateProcessing.classList.add('hidden');
         elements.stateResults.classList.add('hidden');
 
-        // Mostrar la sección correspondiente
         switch (newState) {
             case State.UPLOAD:
                 elements.stateUpload.classList.remove('hidden');
@@ -51,6 +62,34 @@
             case State.RESULTS:
                 elements.stateResults.classList.remove('hidden');
                 break;
+        }
+    }
+
+    // --- Tabs ---
+
+    function switchTab(mode) {
+        currentInputMode = mode;
+        hideError();
+        elements.btnAnalyze.disabled = true;
+
+        if (mode === InputMode.FILE) {
+            elements.tabFile.classList.add('input-tab--active');
+            elements.tabUrl.classList.remove('input-tab--active');
+            elements.panelFile.classList.remove('hidden');
+            elements.panelUrl.classList.add('hidden');
+            // Re-check if file is selected
+            if (elements.fileInput.files && elements.fileInput.files[0]) {
+                elements.btnAnalyze.disabled = false;
+            }
+        } else {
+            elements.tabUrl.classList.add('input-tab--active');
+            elements.tabFile.classList.remove('input-tab--active');
+            elements.panelUrl.classList.remove('hidden');
+            elements.panelFile.classList.add('hidden');
+            // Re-check if URL has value
+            if (elements.urlInput.value.trim()) {
+                elements.btnAnalyze.disabled = false;
+            }
         }
     }
 
@@ -110,36 +149,61 @@
         }
     }
 
+    // --- URL input change ---
+
+    function handleUrlInput() {
+        if (elements.urlInput.value.trim()) {
+            elements.btnAnalyze.disabled = false;
+        } else {
+            elements.btnAnalyze.disabled = true;
+        }
+    }
+
     // --- Envío del formulario ---
 
     async function handleSubmit(event) {
         event.preventDefault();
         hideError();
 
-        var file = elements.fileInput.files[0];
-        if (!file) {
-            showError('Por favor selecciona un archivo.');
-            return;
-        }
+        var formData = new FormData();
 
-        // Validación del lado del cliente (informativa)
-        var ext = file.name.split('.').pop().toLowerCase();
-        if (ext !== 'pdf' && ext !== 'docx') {
-            showError('Solo se aceptan archivos PDF (.pdf) y Word (.docx).');
-            return;
-        }
+        if (currentInputMode === InputMode.FILE) {
+            var file = elements.fileInput.files[0];
+            if (!file) {
+                showError('Por favor selecciona un archivo.');
+                return;
+            }
 
-        if (file.size > 10 * 1024 * 1024) {
-            showError('El archivo excede el tamaño máximo de 10 MB.');
-            return;
+            // Validación del lado del cliente
+            var ext = file.name.split('.').pop().toLowerCase();
+            if (ext !== 'pdf' && ext !== 'docx' && ext !== 'txt') {
+                showError('Solo se aceptan archivos PDF (.pdf), Word (.docx) y texto (.txt).');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showError('El archivo excede el tamaño máximo de 10 MB.');
+                return;
+            }
+
+            formData.append('file', file);
+        } else {
+            var url = elements.urlInput.value.trim();
+            if (!url) {
+                showError('Por favor ingresa una URL.');
+                return;
+            }
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                showError('La URL debe comenzar con http:// o https://');
+                return;
+            }
+
+            formData.append('url', url);
         }
 
         // Cambiar a estado de procesamiento
         setState(State.PROCESSING);
-
-        // Enviar archivo al backend
-        var formData = new FormData();
-        formData.append('file', file);
 
         try {
             var response = await fetch('/api/v1/analyze', {
@@ -166,7 +230,6 @@
     // --- Renderizado de resultados ---
 
     function renderResults(data) {
-        // Renderizar summary_points
         elements.summaryList.innerHTML = '';
         data.summary_points.forEach(function (point) {
             var li = document.createElement('li');
@@ -174,7 +237,6 @@
             elements.summaryList.appendChild(li);
         });
 
-        // Renderizar risk_clauses
         elements.riskClausesContainer.innerHTML = '';
 
         if (data.risk_clauses.length === 0) {
@@ -237,13 +299,13 @@
     // --- Reiniciar análisis ---
 
     function handleNewAnalysis() {
-        // Limpiar formulario y resultados
         elements.uploadForm.reset();
         elements.fileNameDisplay.textContent = '';
         elements.btnAnalyze.disabled = true;
         elements.summaryList.innerHTML = '';
         elements.riskClausesContainer.innerHTML = '';
         hideError();
+        switchTab(InputMode.FILE);
         setState(State.UPLOAD);
     }
 
@@ -254,7 +316,6 @@
         if (stored) {
             return stored;
         }
-        // Respetar preferencia del sistema
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             return 'dark';
         }
@@ -277,16 +338,13 @@
     }
 
     function setupThemeToggle() {
-        // Aplicar tema al cargar
         applyTheme(getPreferredTheme());
 
-        // Escuchar click en el botón
         var btn = document.getElementById('theme-toggle');
         if (btn) {
             btn.addEventListener('click', toggleTheme);
         }
 
-        // Escuchar cambios en preferencia del sistema
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
                 if (!localStorage.getItem('theme')) {
@@ -306,9 +364,13 @@
         elements.uploadForm.addEventListener('submit', handleSubmit);
         elements.btnNewAnalysis.addEventListener('click', handleNewAnalysis);
         elements.btnDismissError.addEventListener('click', hideError);
+
+        // Tabs
+        elements.tabFile.addEventListener('click', function () { switchTab(InputMode.FILE); });
+        elements.tabUrl.addEventListener('click', function () { switchTab(InputMode.URL); });
+        elements.urlInput.addEventListener('input', handleUrlInput);
     }
 
-    // Ejecutar cuando el DOM esté listo
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

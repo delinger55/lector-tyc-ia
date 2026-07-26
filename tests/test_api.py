@@ -106,7 +106,7 @@ class TestProperty1ExtensionValidation:
     @settings(max_examples=50, deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture])
     @given(
         ext=st.sampled_from(
-            [".txt", ".doc", ".jpg", ".png", ".html", ".csv", ".xlsx", ".zip", ".exe", ".py"]
+            [".doc", ".jpg", ".png", ".html", ".csv", ".xlsx", ".zip", ".exe", ".py", ".rtf"]
         )
     )
     async def test_invalid_extensions_return_400(self, ext: str, client: AsyncClient):
@@ -194,7 +194,7 @@ class TestProperty9InvalidFilesReturn400:
         """Formato no soportado → 400."""
         response = await client.post(
             "/api/v1/analyze",
-            files={"file": ("doc.txt", b"contenido", "text/plain")},
+            files={"file": ("doc.rtf", b"contenido", "text/plain")},
         )
         assert response.status_code == 400
         data = response.json()
@@ -228,7 +228,7 @@ class TestProperty9InvalidFilesReturn400:
         """El campo detail está en español."""
         response = await client.post(
             "/api/v1/analyze",
-            files={"file": ("doc.txt", b"x", "text/plain")},
+            files={"file": ("doc.rtf", b"x", "text/plain")},
         )
         data = response.json()
         # Verificar que el mensaje contiene palabras en español
@@ -298,3 +298,63 @@ class TestAnalyzeEndpointUnit:
             assert "severity" in clause
             assert "explanation" in clause
             assert clause["severity"] in ["HIGH", "MEDIUM", "LOW"]
+
+
+# --- Tests para .txt y URL ---
+
+
+class TestTxtFileEndpoint:
+    """Tests para el flujo de archivos .txt."""
+
+    async def test_valid_txt_returns_200(self, client: AsyncClient):
+        """Archivo .txt válido con texto suficiente → 200."""
+        content = ("Este es un documento de prueba con términos y condiciones. " * 5).encode("utf-8")
+        response = await client.post(
+            "/api/v1/analyze",
+            files={"file": ("terms.txt", content, "text/plain")},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["summary_points"]) == 5
+
+    async def test_txt_extension_accepted(self, client: AsyncClient):
+        """Extensión .txt no retorna INVALID_FORMAT."""
+        content = ("Texto de prueba suficiente para el análisis del documento. " * 3).encode("utf-8")
+        response = await client.post(
+            "/api/v1/analyze",
+            files={"file": ("readme.txt", content, "text/plain")},
+        )
+        if response.status_code == 400:
+            assert response.json()["error_code"] != "INVALID_FORMAT"
+
+
+class TestUrlEndpoint:
+    """Tests para el flujo de análisis por URL."""
+
+    async def test_url_without_file_is_accepted(self, client: AsyncClient):
+        """Enviar solo URL (sin file) es procesado por el endpoint."""
+        # Usamos una URL inválida para verificar que llega al extractor
+        response = await client.post(
+            "/api/v1/analyze",
+            data={"url": "not-a-valid-url"},
+        )
+        # Debe retornar 400 CORRUPT_FILE (URL inválida), no 422 (validation)
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error_code"] == "CORRUPT_FILE"
+
+    async def test_url_invalid_protocol_returns_400(self, client: AsyncClient):
+        """URL sin http/https → 400."""
+        response = await client.post(
+            "/api/v1/analyze",
+            data={"url": "ftp://ejemplo.com/terms"},
+        )
+        assert response.status_code == 400
+
+    async def test_url_empty_returns_400(self, client: AsyncClient):
+        """URL vacía con file vacío → 400."""
+        response = await client.post(
+            "/api/v1/analyze",
+            data={"url": ""},
+        )
+        assert response.status_code == 400

@@ -19,7 +19,7 @@ class InvalidFormatException(AppBaseException):
 
     def __init__(self):
         super().__init__(
-            message="Solo se aceptan archivos en formato PDF (.pdf) y Word (.docx).",
+            message="Solo se aceptan archivos en formato PDF (.pdf), Word (.docx) o texto (.txt).",
             error_code="INVALID_FORMAT",
         )
 

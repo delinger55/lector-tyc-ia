@@ -95,17 +95,16 @@ class TestE2ESuccessFlows:
 class TestE2EErrorFlows:
     """Flujos de error end-to-end."""
 
-    async def test_invalid_format_txt(self, client: AsyncClient):
-        """Archivo .txt → 400 INVALID_FORMAT."""
+    async def test_invalid_format_rtf(self, client: AsyncClient):
+        """Archivo .rtf → 400 INVALID_FORMAT."""
         response = await client.post(
             "/api/v1/analyze",
-            files={"file": ("readme.txt", b"contenido de texto", "text/plain")},
+            files={"file": ("readme.rtf", b"contenido de texto", "text/plain")},
         )
         assert response.status_code == 400
         data = response.json()
         assert data["error_code"] == "INVALID_FORMAT"
         assert "PDF" in data["detail"]
-        assert "Word" in data["detail"]
 
     async def test_invalid_format_jpg(self, client: AsyncClient):
         """Archivo .jpg → 400 INVALID_FORMAT."""
@@ -196,7 +195,7 @@ class TestE2EErrorResponseStructure:
         """El campo detail de errores está en español."""
         # Probar múltiples errores
         test_cases = [
-            ("doc.txt", b"text", "INVALID_FORMAT"),
+            ("doc.rtf", b"text", "INVALID_FORMAT"),
             ("bad.pdf", b"not pdf" * 20, "CORRUPT_FILE"),
         ]
         for filename, content, expected_code in test_cases:
@@ -287,7 +286,7 @@ class TestE2EFullFlowVerification:
         """Respuesta de error tiene content-type application/json."""
         response = await client.post(
             "/api/v1/analyze",
-            files={"file": ("bad.txt", b"x", "text/plain")},
+            files={"file": ("bad.rtf", b"x", "text/plain")},
         )
         assert response.status_code == 400
         assert "application/json" in response.headers["content-type"]

@@ -205,9 +205,10 @@ class TestGetExtractor:
         assert isinstance(extractor, DocxExtractor)
 
     def test_raises_invalid_format_for_txt(self):
-        """Extensión .txt lanza InvalidFormatException."""
-        with pytest.raises(InvalidFormatException):
-            get_extractor("archivo.txt")
+        """Extensión .txt ahora ES soportada (retorna TxtExtractor)."""
+        extractor = get_extractor("archivo.txt")
+        from app.extractors.txt_extractor import TxtExtractor
+        assert isinstance(extractor, TxtExtractor)
 
     def test_raises_invalid_format_for_doc(self):
         """Extensión .doc (viejo Word) lanza InvalidFormatException."""
@@ -223,3 +224,52 @@ class TestGetExtractor:
         """Extensión .jpg lanza InvalidFormatException."""
         with pytest.raises(InvalidFormatException):
             get_extractor("imagen.jpg")
+
+
+# --- Tests TxtExtractor ---
+
+
+class TestTxtExtractor:
+    """Unit tests para TxtExtractor."""
+
+    def test_extracts_utf8_text(self):
+        """Extrae texto UTF-8 correctamente."""
+        from app.extractors.txt_extractor import TxtExtractor
+
+        text = "Términos y condiciones con caracteres especiales: áéíóú ñ"
+        content = text.encode("utf-8")
+        extractor = TxtExtractor()
+        result = extractor.extract(content)
+        assert result == text
+
+    def test_extracts_latin1_text(self):
+        """Extrae texto Latin-1 cuando UTF-8 falla."""
+        from app.extractors.txt_extractor import TxtExtractor
+
+        text = "Términos con acentos: áéíóú"
+        content = text.encode("latin-1")
+        extractor = TxtExtractor()
+        result = extractor.extract(content)
+        assert "rminos" in result  # El contenido se decodifica
+
+    def test_raises_extraction_error_for_empty_bytes(self):
+        """Bytes vacíos lanzan ExtractionError."""
+        from app.extractors.txt_extractor import TxtExtractor
+
+        extractor = TxtExtractor()
+        with pytest.raises(ExtractionError):
+            extractor.extract(b"")
+
+    def test_factory_returns_txt_extractor(self):
+        """Factory retorna TxtExtractor para .txt."""
+        from app.extractors.txt_extractor import TxtExtractor
+
+        extractor = get_extractor("document.txt")
+        assert isinstance(extractor, TxtExtractor)
+
+    def test_factory_returns_txt_extractor_case_insensitive(self):
+        """Factory retorna TxtExtractor para .TXT."""
+        from app.extractors.txt_extractor import TxtExtractor
+
+        extractor = get_extractor("document.TXT")
+        assert isinstance(extractor, TxtExtractor)

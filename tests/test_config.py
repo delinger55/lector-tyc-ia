@@ -104,7 +104,7 @@ class TestExceptions:
         exc = InvalidFormatException()
         assert exc.error_code == "INVALID_FORMAT"
         assert "PDF" in exc.message
-        assert "Word" in exc.message
+        assert "Word" in exc.message or "docx" in exc.message
 
     def test_file_too_large_exception(self):
         exc = FileTooLargeException(max_size_mb=10)

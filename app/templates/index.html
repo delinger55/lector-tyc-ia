@@ -4,52 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lector de Términos y Condiciones con IA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
     <div class="container">
         <header class="app-header">
             <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema">
-                <span class="icon-sun">☀️</span>
-                <span class="icon-moon">🌙</span>
+                <span class="icon-sun">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </span>
+                <span class="icon-moon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </span>
             </button>
-            <h1 class="app-title">Lector de Términos y Condiciones con IA</h1>
-            <p class="app-subtitle">Analiza documentos legales de forma simple y clara</p>
+            <div class="header-content">
+                <div class="header-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <span>IA Legal Analysis v1.0</span>
+                </div>
+                <h1 class="app-title">Lector de Términos y Condiciones con IA</h1>
+                <p class="app-subtitle">Analiza documentos legales de forma simple y clara</p>
+            </div>
         </header>
 
         <!-- Estado 1: Upload -->
         <section id="state-upload" class="state-section">
             <div class="disclaimer">
-                <span class="disclaimer-icon">⚖️</span>
+                <span class="disclaimer-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </span>
                 <p><strong>Aviso legal:</strong> Este análisis es generado por inteligencia artificial
                 con fines informativos y no constituye asesoría legal profesional. Para decisiones
                 legales, consulte a un abogado.</p>
             </div>
 
             <div class="privacy-notice">
-                <span class="privacy-icon">🔒</span>
+                <span class="privacy-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </span>
                 <p>El contenido del documento será enviado a una API externa de inteligencia artificial
                 para su análisis. El documento no se almacena después del procesamiento y se elimina
                 de la memoria una vez entregado el resultado.</p>
             </div>
 
             <form id="upload-form" enctype="multipart/form-data">
-                <div class="upload-area" id="drop-zone">
-                    <div class="upload-icon">📄</div>
-                    <p class="upload-text">Arrastra tu archivo aquí o haz clic para seleccionar</p>
-                    <p class="upload-hint">PDF o Word (.docx) — Máximo 10 MB</p>
-                    <input type="file" id="file-input" name="file" accept=".pdf,.docx" required>
-                    <p class="file-name" id="file-name-display"></p>
+                <!-- Tabs: Archivo / URL -->
+                <div class="input-tabs">
+                    <button type="button" id="tab-file" class="input-tab input-tab--active" aria-label="Subir archivo">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Subir archivo
+                    </button>
+                    <button type="button" id="tab-url" class="input-tab" aria-label="Ingresar URL">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        Ingresar URL
+                    </button>
                 </div>
+
+                <!-- Panel: Subir archivo -->
+                <div id="panel-file" class="input-panel">
+                    <div class="upload-area" id="drop-zone">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Arrastra tu archivo aquí o haz clic para seleccionar</p>
+                        <p class="upload-hint">Máximo 10 MB</p>
+                        <div class="upload-formats">
+                            <span class="format-badge format-badge--pdf">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                .PDF
+                            </span>
+                            <span class="format-badge format-badge--docx">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                .DOCX
+                            </span>
+                            <span class="format-badge format-badge--txt">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                .TXT
+                            </span>
+                        </div>
+                        <input type="file" id="file-input" name="file" accept=".pdf,.docx,.txt">
+                        <p class="file-name" id="file-name-display"></p>
+                    </div>
+                </div>
+
+                <!-- Panel: Ingresar URL -->
+                <div id="panel-url" class="input-panel hidden">
+                    <div class="url-input-area">
+                        <label for="url-input" class="url-label">URL de la página de términos y condiciones</label>
+                        <div class="url-field">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            <input type="url" id="url-input" name="url" placeholder="https://ejemplo.com/terminos-y-condiciones">
+                        </div>
+                        <p class="url-hint">Pega la URL completa de la página que contiene los términos y condiciones</p>
+                    </div>
+                </div>
+
                 <button type="submit" id="btn-analyze" class="btn-primary" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
                     Analizar documento
                 </button>
             </form>
 
             <div class="error-banner hidden" id="error-banner">
-                <span class="error-icon">⚠️</span>
+                <span class="error-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </span>
                 <p id="error-message"></p>
-                <button id="btn-dismiss-error" class="btn-dismiss">&times;</button>
+                <button id="btn-dismiss-error" class="btn-dismiss" aria-label="Cerrar">&times;</button>
             </div>
         </section>
 
@@ -59,6 +164,11 @@
                 <div class="spinner"></div>
                 <p class="processing-text">Analizando documento...</p>
                 <p class="processing-hint">Esto puede tomar unos segundos dependiendo de la extensión del documento</p>
+                <div class="processing-steps">
+                    <span class="step step--active">Extrayendo texto</span>
+                    <span class="step">Analizando cláusulas</span>
+                    <span class="step">Generando resumen</span>
+                </div>
             </div>
         </section>
 
@@ -67,12 +177,29 @@
             <div class="results-layout">
                 <div class="results-main">
                     <div class="summary-section">
-                        <h2 class="section-title">📋 Resumen: lo que estás aceptando</h2>
+                        <h2 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg>
+                            Resumen: lo que estás aceptando
+                        </h2>
                         <ol id="summary-list" class="summary-list"></ol>
                     </div>
 
                     <div class="risk-section">
-                        <h2 class="section-title">🚨 Cláusulas de riesgo identificadas</h2>
+                        <h2 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            Cláusulas de riesgo identificadas
+                        </h2>
                         <div id="risk-clauses-container"></div>
                         <p class="no-risks hidden" id="no-risks-message">
                             No se identificaron cláusulas de riesgo significativas.
@@ -82,7 +209,13 @@
 
                 <aside class="results-sidebar">
                     <div class="disclaimer disclaimer--compact">
-                        <span class="disclaimer-icon">⚖️</span>
+                        <span class="disclaimer-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </span>
                         <p><strong>Aviso legal:</strong> Este análisis es generado por inteligencia
                         artificial con fines informativos y no constituye asesoría legal profesional.</p>
                     </div>
@@ -104,6 +237,10 @@
 
             <div class="results-footer">
                 <button id="btn-new-analysis" class="btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="1 4 1 10 7 10"></polyline>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
                     Analizar otro documento
                 </button>
             </div>
