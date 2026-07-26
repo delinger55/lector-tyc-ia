@@ -7,56 +7,104 @@
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
-    <!-- Estado 1: Upload -->
-    <section id="state-upload" class="state-section">
-        <h1>Lector de Términos y Condiciones con IA</h1>
+    <div class="container">
+        <header class="app-header">
+            <h1 class="app-title">Lector de Términos y Condiciones con IA</h1>
+            <p class="app-subtitle">Analiza documentos legales de forma simple y clara</p>
+        </header>
 
-        <div class="disclaimer">
-            <p><strong>Aviso legal:</strong> Este análisis es generado por inteligencia artificial
-            con fines informativos y no constituye asesoría legal profesional.</p>
-        </div>
-
-        <div class="privacy-notice">
-            <p>El contenido del documento será enviado a una API externa de inteligencia artificial
-            para su análisis. El documento no se almacena después del procesamiento.</p>
-        </div>
-
-        <form id="upload-form" enctype="multipart/form-data">
-            <div class="upload-area">
-                <input type="file" id="file-input" name="file" accept=".pdf,.docx" required>
-                <p>Selecciona un archivo PDF o Word (.docx), máximo 10 MB</p>
-            </div>
-            <button type="submit" id="btn-analyze">Analizar documento</button>
-        </form>
-    </section>
-
-    <!-- Estado 2: Processing -->
-    <section id="state-processing" class="state-section hidden">
-        <div class="spinner"></div>
-        <p>Analizando documento...</p>
-        <p class="subtitle">Esto puede tomar unos segundos</p>
-    </section>
-
-    <!-- Estado 3: Results -->
-    <section id="state-results" class="state-section hidden">
-        <div class="results-header">
-            <div class="summary-section">
-                <h2>Resumen del documento</h2>
-                <ul id="summary-list"></ul>
-            </div>
+        <!-- Estado 1: Upload -->
+        <section id="state-upload" class="state-section">
             <div class="disclaimer">
+                <span class="disclaimer-icon">⚖️</span>
                 <p><strong>Aviso legal:</strong> Este análisis es generado por inteligencia artificial
-                con fines informativos y no constituye asesoría legal profesional.</p>
+                con fines informativos y no constituye asesoría legal profesional. Para decisiones
+                legales, consulte a un abogado.</p>
             </div>
-        </div>
 
-        <div class="risk-section">
-            <h2>Cláusulas de riesgo</h2>
-            <div id="risk-clauses-container"></div>
-        </div>
+            <div class="privacy-notice">
+                <span class="privacy-icon">🔒</span>
+                <p>El contenido del documento será enviado a una API externa de inteligencia artificial
+                para su análisis. El documento no se almacena después del procesamiento y se elimina
+                de la memoria una vez entregado el resultado.</p>
+            </div>
 
-        <button id="btn-new-analysis">Analizar otro documento</button>
-    </section>
+            <form id="upload-form" enctype="multipart/form-data">
+                <div class="upload-area" id="drop-zone">
+                    <div class="upload-icon">📄</div>
+                    <p class="upload-text">Arrastra tu archivo aquí o haz clic para seleccionar</p>
+                    <p class="upload-hint">PDF o Word (.docx) — Máximo 10 MB</p>
+                    <input type="file" id="file-input" name="file" accept=".pdf,.docx" required>
+                    <p class="file-name" id="file-name-display"></p>
+                </div>
+                <button type="submit" id="btn-analyze" class="btn-primary" disabled>
+                    Analizar documento
+                </button>
+            </form>
+
+            <div class="error-banner hidden" id="error-banner">
+                <span class="error-icon">⚠️</span>
+                <p id="error-message"></p>
+                <button id="btn-dismiss-error" class="btn-dismiss">&times;</button>
+            </div>
+        </section>
+
+        <!-- Estado 2: Processing -->
+        <section id="state-processing" class="state-section hidden">
+            <div class="processing-container">
+                <div class="spinner"></div>
+                <p class="processing-text">Analizando documento...</p>
+                <p class="processing-hint">Esto puede tomar unos segundos dependiendo de la extensión del documento</p>
+            </div>
+        </section>
+
+        <!-- Estado 3: Results -->
+        <section id="state-results" class="state-section hidden">
+            <div class="results-layout">
+                <div class="results-main">
+                    <div class="summary-section">
+                        <h2 class="section-title">📋 Resumen: lo que estás aceptando</h2>
+                        <ol id="summary-list" class="summary-list"></ol>
+                    </div>
+
+                    <div class="risk-section">
+                        <h2 class="section-title">🚨 Cláusulas de riesgo identificadas</h2>
+                        <div id="risk-clauses-container"></div>
+                        <p class="no-risks hidden" id="no-risks-message">
+                            No se identificaron cláusulas de riesgo significativas.
+                        </p>
+                    </div>
+                </div>
+
+                <aside class="results-sidebar">
+                    <div class="disclaimer disclaimer--compact">
+                        <span class="disclaimer-icon">⚖️</span>
+                        <p><strong>Aviso legal:</strong> Este análisis es generado por inteligencia
+                        artificial con fines informativos y no constituye asesoría legal profesional.</p>
+                    </div>
+
+                    <div class="severity-legend">
+                        <h3>Niveles de riesgo</h3>
+                        <div class="legend-item legend-item--high">
+                            <span class="legend-dot"></span> Alto
+                        </div>
+                        <div class="legend-item legend-item--medium">
+                            <span class="legend-dot"></span> Medio
+                        </div>
+                        <div class="legend-item legend-item--low">
+                            <span class="legend-dot"></span> Bajo
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="results-footer">
+                <button id="btn-new-analysis" class="btn-primary">
+                    Analizar otro documento
+                </button>
+            </div>
+        </section>
+    </div>
 
     <script src="/static/js/app.js"></script>
 </body>
