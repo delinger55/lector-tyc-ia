@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lector de Términos y Condiciones con IA</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <!-- Estado 1: Upload -->
+    <section id="state-upload" class="state-section">
+        <h1>Lector de Términos y Condiciones con IA</h1>
+
+        <div class="disclaimer">
+            <p><strong>Aviso legal:</strong> Este análisis es generado por inteligencia artificial
+            con fines informativos y no constituye asesoría legal profesional.</p>
+        </div>
+
+        <div class="privacy-notice">
+            <p>El contenido del documento será enviado a una API externa de inteligencia artificial
+            para su análisis. El documento no se almacena después del procesamiento.</p>
+        </div>
+
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="upload-area">
+                <input type="file" id="file-input" name="file" accept=".pdf,.docx" required>
+                <p>Selecciona un archivo PDF o Word (.docx), máximo 10 MB</p>
+            </div>
+            <button type="submit" id="btn-analyze">Analizar documento</button>
+        </form>
+    </section>
+
+    <!-- Estado 2: Processing -->
+    <section id="state-processing" class="state-section hidden">
+        <div class="spinner"></div>
+        <p>Analizando documento...</p>
+        <p class="subtitle">Esto puede tomar unos segundos</p>
+    </section>
+
+    <!-- Estado 3: Results -->
+    <section id="state-results" class="state-section hidden">
+        <div class="results-header">
+            <div class="summary-section">
+                <h2>Resumen del documento</h2>
+                <ul id="summary-list"></ul>
+            </div>
+            <div class="disclaimer">
+                <p><strong>Aviso legal:</strong> Este análisis es generado por inteligencia artificial
+                con fines informativos y no constituye asesoría legal profesional.</p>
+            </div>
+        </div>
+
+        <div class="risk-section">
+            <h2>Cláusulas de riesgo</h2>
+            <div id="risk-clauses-container"></div>
+        </div>
+
+        <button id="btn-new-analysis">Analizar otro documento</button>
+    </section>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
