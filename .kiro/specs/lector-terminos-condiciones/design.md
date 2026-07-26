@@ -686,152 +686,83 @@ Primer intento de análisis
 
 ## Frontend Design
 
+### Sistema de diseño
+
+La interfaz sigue un estilo SaaS moderno inspirado en Vercel/Linear, con tipografía Inter, glassmorphism y micro-interacciones.
+
+**Tipografía:** Inter (Google Fonts), pesos 400/500/600/700, letter-spacing ajustado para títulos.
+
+**Paleta de colores (Light mode):**
+- Background: `#f9fafb` (gris neutro limpio)
+- Surface/Cards: `#ffffff` con `box-shadow` sutil
+- Primary: `#2563eb` (azul profesional)
+- Text: `#111827` / Secondary: `#6b7280`
+- Severidad: High `#ef4444`, Medium `#f59e0b`, Low `#10b981`
+
+**Paleta de colores (Dark mode)** via `[data-theme="dark"]`:
+- Background: `#0a0f1a` (azul oscuro profundo)
+- Surface: `#111827`, Elevated: `#1f2937`
+- Primary: `#60a5fa`
+- Text: `#f3f4f6` / Secondary: `#9ca3af`
+- Severidad con colores claros para contraste sobre fondo oscuro
+
+**Efectos visuales:**
+- Glassmorphism: `backdrop-filter: blur(8px)` en tarjetas de riesgo
+- Transiciones: `transition: all 0.2s ease` en elementos interactivos
+- Hover lift: `transform: translateY(-1px)` + shadow progression
+- Animaciones de entrada: `fadeIn` (opacity + translateY) en transiciones de estado
+- Drag-over: `scale(1.01)` + ring outline `box-shadow: 0 0 0 4px rgba(...)`
+
 ### Estados de la interfaz
 
-La interfaz opera con 3 estados gestionados mediante JavaScript nativo (sin framework):
+3 estados gestionados con JavaScript nativo (IIFE pattern, sin frameworks):
 
-```
-┌─────────────────────────────────────────────────┐
-│  ESTADO 1: UPLOAD                               │
-│                                                 │
-│  ┌───────────────────────────────────────────┐  │
-│  │  [Logo/Título]                            │  │
-│  │                                           │  │
-│  │  ⚠️ DISCLAIMER LEGAL                      │  │
-│  │  "Este análisis es generado por IA con    │  │
-│  │   fines informativos..."                  │  │
-│  │                                           │  │
-│  │  ℹ️ "El contenido será enviado a una API  │  │
-│  │   externa de IA para su análisis"         │  │
-│  │                                           │  │
-│  │  ┌─────────────────────────────────┐      │  │
-│  │  │  Arrastra o selecciona archivo  │      │  │
-│  │  │  (PDF o Word, máx 10 MB)       │      │  │
-│  │  └─────────────────────────────────┘      │  │
-│  │                                           │  │
-│  │  [Analizar documento]                     │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
+**Estado 1: UPLOAD** — Pantalla principal con:
+- Header: badge de versión + título + toggle dark mode (SVG sol/luna)
+- Disclaimer legal (ícono SVG info-circle, fondo azul suave)
+- Aviso de privacidad (ícono SVG candado, fondo verde suave)
+- Tabs: "Subir archivo" | "Ingresar URL" (pill-style selector)
+- Panel archivo: Zona drag-and-drop con íconos SVG, badges de formato (.PDF, .DOCX, .TXT), micro-animaciones
+- Panel URL: Campo de texto con ícono globe, placeholder descriptivo
+- Botón "Analizar documento" con ícono SVG
 
-┌─────────────────────────────────────────────────┐
-│  ESTADO 2: PROCESSING                           │
-│                                                 │
-│  ┌───────────────────────────────────────────┐  │
-│  │                                           │  │
-│  │        [Spinner/Animación]                │  │
-│  │                                           │  │
-│  │   "Analizando documento..."               │  │
-│  │   "Esto puede tomar unos segundos"        │  │
-│  │                                           │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
+**Estado 2: PROCESSING** — Indicador de progreso con:
+- Spinner CSS animado (border-top rotation)
+- Texto "Analizando documento..."
+- Pasos del proceso como badges (Extrayendo texto → Analizando cláusulas → Generando resumen)
 
-┌─────────────────────────────────────────────────┐
-│  ESTADO 3: RESULTS                              │
-│                                                 │
-│  ┌───────────────────────────────────────────┐  │
-│  │  RESUMEN (5 puntos)          DISCLAIMER   │  │
-│  │  • Punto 1                   ⚠️ "Este     │  │
-│  │  • Punto 2                   análisis..." │  │
-│  │  • Punto 3                                │  │
-│  │  • Punto 4                                │  │
-│  │  • Punto 5                                │  │
-│  │                                           │  │
-│  │  CLÁUSULAS DE RIESGO                      │  │
-│  │  ┌─────────────────────────────────────┐  │  │
-│  │  │ 🔴 [HIGH] Título de cláusula       │  │  │
-│  │  │    Explicación en lenguaje simple   │  │  │
-│  │  │    "Cita del documento"             │  │  │
-│  │  ├─────────────────────────────────────┤  │  │
-│  │  │ 🟡 [MEDIUM] Otra cláusula          │  │  │
-│  │  │    Explicación...                   │  │  │
-│  │  ├─────────────────────────────────────┤  │  │
-│  │  │ 🟢 [LOW] Cláusula menor            │  │  │
-│  │  │    Explicación...                   │  │  │
-│  │  └─────────────────────────────────────┘  │  │
-│  │                                           │  │
-│  │  [Analizar otro documento]                │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
-```
+**Estado 3: RESULTS** — Grid 2 columnas (main + sidebar):
+- Main: Resumen (5 puntos como lista numerada con cards) + Cláusulas de riesgo (cards con border-left por severidad, badges SVG, glassmorphism)
+- Sidebar: Disclaimer compacto + leyenda de severidad
+- Botón "Analizar otro documento"
 
 ### Transiciones de estado
 
 ```mermaid
 stateDiagram-v2
     [*] --> Upload: GET / (carga inicial)
-    Upload --> Processing: Click "Analizar" (fetch POST)
+    Upload --> Processing: Click "Analizar" (fetch POST con file O url)
     Processing --> Results: Respuesta exitosa (200)
-    Processing --> Upload: Error (muestra mensaje)
+    Processing --> Upload: Error (muestra banner dismissable)
     Results --> Upload: Click "Analizar otro"
 ```
 
-### Implementación JavaScript
+### Input dual (File / URL)
 
-```javascript
-// app/static/js/app.js (estructura)
-const AppState = {
-    UPLOAD: 'upload',
-    PROCESSING: 'processing',
-    RESULTS: 'results'
-};
+El endpoint acepta dos modos de entrada via tabs en el frontend:
+- **Modo archivo**: FormData con campo `file` (PDF, DOCX, TXT)
+- **Modo URL**: FormData con campo `url` (string http/https)
 
-function setState(newState, data = null) {
-    // Ocultar todas las secciones
-    document.querySelectorAll('.state-section').forEach(s => s.classList.add('hidden'));
-    // Mostrar la sección correspondiente
-    document.getElementById(`state-${newState}`).classList.remove('hidden');
-    // Renderizar datos si es estado de resultados
-    if (newState === AppState.RESULTS && data) {
-        renderResults(data);
-    }
-}
+El JS envía solo el campo activo según la tab seleccionada.
 
-async function handleSubmit(event) {
-    event.preventDefault();
-    setState(AppState.PROCESSING);
-    
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
-    
-    try {
-        const response = await fetch('/api/v1/analyze', {
-            method: 'POST',
-            body: formData
-        });
-        if (!response.ok) {
-            const error = await response.json();
-            showError(error.detail);
-            setState(AppState.UPLOAD);
-            return;
-        }
-        const result = await response.json();
-        setState(AppState.RESULTS, result);
-    } catch (error) {
-        showError('Error de conexión. Intente nuevamente.');
-        setState(AppState.UPLOAD);
-    }
-}
-```
+### Dark Mode
 
-### Colores de severidad (CSS)
+- Toggle persiste en `localStorage`
+- Respeta `prefers-color-scheme` del sistema al primer acceso
+- Variables CSS se redefinen completamente bajo `[data-theme="dark"]`
+- Transición suave de 0.3s en background-color y color del body
 
-```css
-.risk-clause--high {
-    border-left: 4px solid #dc3545;  /* Rojo */
-    background-color: #fff5f5;
-}
-.risk-clause--medium {
-    border-left: 4px solid #ffc107;  /* Amarillo */
-    background-color: #fffbeb;
-}
-.risk-clause--low {
-    border-left: 4px solid #28a745;  /* Verde */
-    background-color: #f0fff4;
-}
-```
-
-*Valida: Requirements 5.1-5.6, 6.1-6.4*
+*Valida: Requirements 5.1-5.6, 6.1-6.4, 13.1-13.8, 14.3*
 
 ## Configuration Management
 

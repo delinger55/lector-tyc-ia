@@ -122,6 +122,33 @@ Plan de implementación incremental basado en el diseño técnico (`design.md`).
     - E2E: PDF válido 200, DOCX válido 200, .txt 400, archivo grande 400, PDF escaneado 400, corrupto 400
     - _Requirements: 1.1-1.4, 2.1-2.5, 7.1, 10.2, 10.3, 12.1-12.6_
 - [ ] 16. **CHECKPOINT FINAL**: Verificar integración completa
+- [x] 17. Soporte para .txt y análisis por URL
+  - [x] 17.1 Implementar `app/extractors/txt_extractor.py` con TxtExtractor (UTF-8 + Latin-1)
+    - _Requirements: 14.1_
+  - [x] 17.2 Implementar `app/extractors/web_extractor.py` con WebUrlExtractor (httpx + BeautifulSoup)
+    - _Requirements: 14.2_
+  - [x] 17.3 Actualizar factory `app/extractors/__init__.py` con .txt y get_web_extractor()
+    - _Requirements: 14.1, 14.2_
+  - [x] 17.4 Actualizar `app/routers/analyze.py` para aceptar .txt y parámetro url opcional
+    - _Requirements: 14.1, 14.4, 14.5_
+  - [x] 17.5 Actualizar frontend con tabs (Subir archivo / Ingresar URL)
+    - _Requirements: 14.3_
+  - [x] 17.6 Actualizar tests existentes y agregar nuevos tests para .txt y URL
+    - Tests: TxtExtractor (UTF-8, Latin-1, vacío, factory), URL endpoint (inválida, sin protocolo, vacía), TXT endpoint (válido 200), Frontend (tabs, url-input, badge .TXT)
+    - _Requirements: 14.1-14.5_
+- [x] 18. Rediseño UI/UX Moderno (estilo SaaS)
+  - [x] 18.1 Actualizar `app/templates/index.html` con diseño moderno
+    - Tipografía Inter (Google Fonts), header con badge de versión, toggle dark mode con SVG, zona drag-and-drop con íconos SVG vectoriales y micro-animaciones, badges de formato (.PDF, .DOCX, .TXT), pasos de procesamiento animados, íconos SVG en section titles y badges de severidad
+    - _Requirements: 13.1, 13.2, 13.3, 13.6, 13.7, 13.8_
+  - [x] 18.2 Refactorizar `app/static/css/styles.css` con sistema de diseño moderno
+    - Variables CSS con paleta sofisticada (light y dark), glassmorphism (backdrop-filter: blur), transiciones suaves (all 0.2s ease), hover lift (translateY -1px + shadow), animaciones fadeIn, grid responsivo con colapso en móvil, estilos para tabs y URL input
+    - _Requirements: 13.4, 13.5_
+  - [x] 18.3 Actualizar `app/static/js/app.js` con micro-interacciones
+    - Theme toggle con localStorage + prefers-color-scheme, tabs para file/URL switching, validación por modo de input, animaciones de estado
+    - _Requirements: 13.2, 13.3_
+  - [x] 18.4 Verificar tests DOM pasan con nueva estructura
+    - Tests existentes validados + test para theme-toggle, tabs, url-input, badge .TXT
+    - _Requirements: 13.1-13.8_
 
 ## Notes
 
@@ -129,6 +156,7 @@ Plan de implementación incremental basado en el diseño técnico (`design.md`).
 - Archivos de prueba se generan programáticamente en fixtures
 - Property tests usan hypothesis con mínimo 200 ejemplos
 - Cada checkpoint verifica que todo lo anterior funciona antes de avanzar
+- Tareas 17 y 18 fueron agregadas post-MVP como mejoras incrementales
 
 ## Task Dependency Graph
 
@@ -151,7 +179,9 @@ Plan de implementación incremental basado en el diseño técnico (`design.md`).
     { "id": 13, "tasks": ["11.3"], "desc": "Tests router" },
     { "id": 14, "tasks": ["13.1", "13.2", "13.3"], "desc": "Frontend" },
     { "id": 15, "tasks": ["13.4", "15.1"], "desc": "Tests frontend + fixtures" },
-    { "id": 16, "tasks": ["15.2"], "desc": "Tests integración E2E" }
+    { "id": 16, "tasks": ["15.2"], "desc": "Tests integración E2E" },
+    { "id": 17, "tasks": ["17.1", "17.2", "17.3", "17.4", "17.5", "17.6"], "desc": "Soporte .txt + URL" },
+    { "id": 18, "tasks": ["18.1", "18.2", "18.3", "18.4"], "desc": "Rediseño UI/UX Moderno" }
   ]
 }
 ```

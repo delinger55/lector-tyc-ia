@@ -152,6 +152,33 @@ Aplicación web "Lector de Términos y Condiciones con IA" que permite a los usu
 1. WHEN el archivo subido está corrupto o es ilegible, THE Sistema SHALL mostrar un mensaje claro indicando que el archivo no pudo ser procesado
 2. WHEN el archivo excede el tamaño máximo, THE Sistema SHALL mostrar un mensaje indicando el límite de tamaño permitido
 3. WHEN el PDF no contiene texto extraíble (documento escaneado), THE Sistema SHALL mostrar un mensaje indicando que documentos escaneados no son compatibles en esta versión
-4. WHEN el formato del archivo no es compatible, THE Sistema SHALL mostrar un mensaje indicando los formatos aceptados (PDF y Word)
+4. WHEN el formato del archivo no es compatible, THE Sistema SHALL mostrar un mensaje indicando los formatos aceptados (PDF, Word y texto plano)
 5. WHEN el documento no contiene términos y condiciones reales, THE Sistema SHALL mostrar un mensaje indicando que el contenido no corresponde a un documento de TyC
 6. WHEN ocurre un error de comunicación con el LLM, THE Sistema SHALL mostrar un mensaje indicando que el servicio de análisis no está disponible temporalmente
+
+### Requirement 13: Interfaz moderna (UI/UX estilo SaaS)
+
+**User Story:** Como usuario, quiero una interfaz visualmente moderna y profesional, para sentir confianza al usar la herramienta con documentos sensibles.
+
+#### Acceptance Criteria
+
+1. THE Sistema SHALL utilizar la tipografía Inter (Google Fonts) como fuente principal de la interfaz
+2. THE Sistema SHALL implementar un sistema de diseño con variables CSS que permita temas claro y oscuro (Dark Mode) mediante atributo `data-theme` en el elemento raíz
+3. THE Sistema SHALL incluir un botón toggle de tema (sol/luna con íconos SVG vectoriales) visible en el header, que persista la preferencia en localStorage y respete `prefers-color-scheme` del sistema
+4. THE Sistema SHALL aplicar efectos de glassmorphism (backdrop-filter, bordes sutiles) y transiciones suaves (transition: all 0.2s ease) en tarjetas de riesgo y elementos interactivos
+5. THE Sistema SHALL representar los badges de severidad con íconos SVG vectoriales y colores de contraste alto tanto en modo claro como oscuro
+6. THE Sistema SHALL incluir micro-animaciones en la zona de drag-and-drop (escala, elevación, cambio de color al arrastrar) y animaciones de entrada (fadeIn) en las transiciones de estado
+7. THE Sistema SHALL mostrar indicadores de formato aceptado (.PDF, .DOCX, .TXT) como badges visuales dentro de la zona de carga
+8. THE Sistema SHALL mostrar pasos del proceso (Extrayendo texto → Analizando cláusulas → Generando resumen) como indicadores visuales en la pantalla de procesamiento
+
+### Requirement 14: Soporte de texto plano y análisis por URL
+
+**User Story:** Como usuario, quiero poder subir archivos de texto plano (.txt) o pegar una URL de una página web, para analizar términos y condiciones en cualquier formato accesible.
+
+#### Acceptance Criteria
+
+1. WHEN el usuario selecciona un archivo con extensión .txt, THE Sistema SHALL aceptar el archivo y extraer su texto con soporte para codificaciones UTF-8 y Latin-1
+2. WHEN el usuario ingresa una URL válida (http:// o https://) en el campo de URL, THE Sistema SHALL descargar la página, eliminar elementos no relevantes (script, style, nav, footer) y extraer el texto limpio
+3. THE Sistema SHALL ofrecer una interfaz con pestañas (tabs) para alternar entre "Subir archivo" e "Ingresar URL"
+4. WHEN se provee una URL, THE Sistema SHALL procesarla sin requerir un archivo adjunto
+5. WHEN la URL no es accesible o no contiene contenido HTML/texto válido, THE Sistema SHALL retornar HTTP 400 con mensaje descriptivo
