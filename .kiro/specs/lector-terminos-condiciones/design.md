@@ -645,15 +645,24 @@ async def app_exception_handler(request: Request, exc: AppBaseException):
 
 | Excepción | HTTP Code | error_code | Causa |
 |-----------|-----------|------------|-------|
-| InvalidFormatException | 400 | INVALID_FORMAT | Extensión no es .pdf/.docx |
+| InvalidFormatException | 400 | INVALID_FORMAT | Extensión no es .pdf/.docx/.txt |
 | FileTooLargeException | 400 | FILE_TOO_LARGE | Archivo > MAX_FILE_SIZE |
 | ScannedDocumentException | 400 | SCANNED_DOCUMENT | PDF con < 100 chars de texto |
 | ExtractionError | 400 | CORRUPT_FILE | Archivo corrupto/ilegible |
+| UrlExtractionError | 400 | URL_EXTRACTION_FAILED | URL no accesible o con restricciones |
 | TextTooLongException | 400 | TEXT_TOO_LONG | Texto > MAX_WORDS |
 | NotTermsException | 400 | NOT_TERMS | No es documento de TyC |
 | LLMTimeoutError | 500 | LLM_TIMEOUT | Timeout en llamada al LLM |
 | LLMCommunicationError | 500 | LLM_COMMUNICATION_ERROR | Error de red con LLM |
 | AnalysisValidationError | 500 | ANALYSIS_FAILED | 2 intentos sin 5 summary_points |
+
+### Manejo dinámico de errores en frontend
+
+El JS detecta el `error_code` de la respuesta JSON y renderiza mensajes enriquecidos según el tipo:
+- `URL_EXTRACTION_FAILED`: Renderiza HTML con título bold + detalle explicativo sobre restricciones de seguridad de sitios web
+- Otros errores: Muestra el campo `detail` directamente como texto plano
+
+Esto permite que errores de URL sean más descriptivos y amigables sin modificar el flujo general de errores.
 
 ### Lógica de reintento
 

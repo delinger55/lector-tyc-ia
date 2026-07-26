@@ -21,12 +21,12 @@ Aplicación web "Lector de Términos y Condiciones con IA" que permite a los usu
 
 ### Requirement 1: Carga de documentos
 
-**User Story:** Como usuario, quiero subir un documento de términos y condiciones en formato PDF o Word, para que el sistema pueda analizar su contenido.
+**User Story:** Como usuario, quiero subir un documento de términos y condiciones en formato PDF, Word o texto plano, para que el sistema pueda analizar su contenido.
 
 #### Acceptance Criteria
 
-1. WHEN el usuario selecciona un archivo con extensión .pdf o .docx, THE Sistema SHALL aceptar el archivo para procesamiento
-2. WHEN el usuario intenta subir un archivo con extensión diferente a .pdf o .docx, THE Sistema SHALL rechazar el archivo y mostrar un mensaje indicando que solo se aceptan formatos PDF y Word
+1. WHEN el usuario selecciona un archivo con extensión .pdf, .docx o .txt, THE Sistema SHALL aceptar el archivo para procesamiento
+2. WHEN el usuario intenta subir un archivo con extensión diferente a .pdf, .docx o .txt, THE Sistema SHALL rechazar el archivo y mostrar un mensaje indicando los formatos aceptados
 3. WHEN el archivo subido excede el tamaño máximo configurado (por defecto 10 MB), THE Sistema SHALL rechazar el archivo y mostrar un mensaje indicando que el tamaño excede el límite permitido
 4. WHEN el usuario sube un archivo válido, THE Sistema SHALL validar la extensión y el tamaño antes de iniciar la extracción de texto
 
@@ -182,3 +182,5 @@ Aplicación web "Lector de Términos y Condiciones con IA" que permite a los usu
 3. THE Sistema SHALL ofrecer una interfaz con pestañas (tabs) para alternar entre "Subir archivo" e "Ingresar URL"
 4. WHEN se provee una URL, THE Sistema SHALL procesarla sin requerir un archivo adjunto
 5. WHEN la URL no es accesible o no contiene contenido HTML/texto válido, THE Sistema SHALL retornar HTTP 400 con mensaje descriptivo
+6. WHEN la URL falla por restricciones de seguridad del sitio web (redes sociales, portales protegidos), THE Sistema SHALL mostrar un mensaje amigable explicando que el sitio bloquea solicitudes automáticas y sugiriendo usar un enlace público de términos o políticas
+7. THE Sistema SHALL priorizar el análisis por URL sobre el archivo cuando ambos inputs están presentes en la misma solicitud
