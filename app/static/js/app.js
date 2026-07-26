@@ -95,14 +95,23 @@
 
     // --- Manejo de errores ---
 
-    function showError(message) {
-        elements.errorMessage.textContent = message;
+    function showError(message, errorCode) {
         elements.errorBanner.classList.remove('hidden');
+
+        if (errorCode === 'URL_EXTRACTION_FAILED') {
+            elements.errorMessage.innerHTML =
+                '<strong>No se pudo acceder a la página web.</strong><br>' +
+                '<span class="error-detail">Es posible que el sitio web tenga restricciones de seguridad ' +
+                '(como redes sociales o portales protegidos) que bloquean las solicitudes automáticas. ' +
+                'Intenta con un enlace de términos o políticas público y accesible.</span>';
+        } else {
+            elements.errorMessage.textContent = message;
+        }
     }
 
     function hideError() {
         elements.errorBanner.classList.add('hidden');
-        elements.errorMessage.textContent = '';
+        elements.errorMessage.innerHTML = '';
     }
 
     // --- Drag and drop ---
@@ -213,7 +222,10 @@
 
             if (!response.ok) {
                 var errorData = await response.json();
-                showError(errorData.detail || 'Ocurrió un error inesperado.');
+                showError(
+                    errorData.detail || 'Ocurrió un error inesperado.',
+                    errorData.error_code || null
+                );
                 setState(State.UPLOAD);
                 return;
             }

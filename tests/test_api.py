@@ -338,10 +338,10 @@ class TestUrlEndpoint:
             "/api/v1/analyze",
             data={"url": "not-a-valid-url"},
         )
-        # Debe retornar 400 CORRUPT_FILE (URL inválida), no 422 (validation)
+        # Debe retornar 400 URL_EXTRACTION_FAILED (URL inválida), no 422 (validation)
         assert response.status_code == 400
         data = response.json()
-        assert data["error_code"] == "CORRUPT_FILE"
+        assert data["error_code"] == "URL_EXTRACTION_FAILED"
 
     async def test_url_invalid_protocol_returns_400(self, client: AsyncClient):
         """URL sin http/https → 400."""

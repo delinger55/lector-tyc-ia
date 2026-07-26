@@ -301,10 +301,10 @@ class TestE2EUrlFlow:
             "/api/v1/analyze",
             data={"url": "not-a-valid-url"},
         )
-        # Debe llegar al WebUrlExtractor y fallar con CORRUPT_FILE (URL inválida)
+        # Debe llegar al WebUrlExtractor y fallar con URL_EXTRACTION_FAILED
         assert response.status_code == 400
         data = response.json()
-        assert data["error_code"] == "CORRUPT_FILE"
+        assert data["error_code"] == "URL_EXTRACTION_FAILED"
 
     async def test_url_invalid_protocol(self, client: AsyncClient):
         """URL sin http/https llega al extractor y falla."""
@@ -314,7 +314,7 @@ class TestE2EUrlFlow:
         )
         assert response.status_code == 400
         data = response.json()
-        assert data["error_code"] == "CORRUPT_FILE"
+        assert data["error_code"] == "URL_EXTRACTION_FAILED"
 
     async def test_url_field_empty_falls_to_invalid_format(self, client: AsyncClient):
         """URL vacía sin archivo → INVALID_FORMAT."""
@@ -335,7 +335,19 @@ class TestE2EUrlFlow:
             data={"url": "not-valid"},
             files={"file": ("terms.txt", txt_content, "text/plain")},
         )
-        # URL tiene prioridad → CORRUPT_FILE (no procesa el file)
+        # URL tiene prioridad → URL_EXTRACTION_FAILED (no procesa el file)
         assert response.status_code == 400
         data = response.json()
-        assert data["error_code"] == "CORRUPT_FILE"
+        assert data["error_code"] == "URL_EXTRACTION_FAILED"
+
+    async def test_url_error_message_is_user_friendly(self, client: AsyncClient):
+        """El mensaje de error de URL es descriptivo y en español."""
+        response = await client.post(
+            "/api/v1/analyze",
+            data={"url": "https://thisdomaindoesnotexist99999.com/terms"},
+        )
+        assert response.status_code == 400
+        data = response.json()
+        assert data["error_code"] == "URL_EXTRACTION_FAILED"
+        assert "página web" in data["detail"]
+        assert "restricciones" in data["detail"]

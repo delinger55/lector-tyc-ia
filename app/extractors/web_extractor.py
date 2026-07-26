@@ -3,7 +3,7 @@
 import httpx
 from bs4 import BeautifulSoup
 
-from app.core.exceptions import ExtractionError
+from app.core.exceptions import UrlExtractionError
 
 
 # Tags a eliminar antes de extraer texto
@@ -33,10 +33,10 @@ class WebUrlExtractor:
             Texto plano extraído de la página.
 
         Raises:
-            ExtractionError: Si no se puede descargar o parsear la página.
+            UrlExtractionError: Si no se puede descargar o parsear la página.
         """
         if not url or not url.startswith(("http://", "https://")):
-            raise ExtractionError()
+            raise UrlExtractionError()
 
         try:
             response = httpx.get(
@@ -47,11 +47,11 @@ class WebUrlExtractor:
             )
             response.raise_for_status()
         except (httpx.HTTPError, httpx.InvalidURL) as e:
-            raise ExtractionError() from e
+            raise UrlExtractionError() from e
 
         content_type = response.headers.get("content-type", "")
         if "text/html" not in content_type and "text/plain" not in content_type:
-            raise ExtractionError()
+            raise UrlExtractionError()
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
@@ -65,10 +65,10 @@ class WebUrlExtractor:
             text = soup.get_text(separator="\n", strip=True)
 
             if not text or len(text) < 50:
-                raise ExtractionError()
+                raise UrlExtractionError()
 
             return text
-        except ExtractionError:
+        except UrlExtractionError:
             raise
         except Exception as e:
-            raise ExtractionError() from e
+            raise UrlExtractionError() from e

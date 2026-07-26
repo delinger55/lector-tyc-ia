@@ -108,3 +108,19 @@ class NotTermsException(AppBaseException):
             message="El contenido del documento no corresponde a términos y condiciones.",
             error_code="NOT_TERMS",
         )
+
+
+class UrlExtractionError(AppBaseException):
+    """No se pudo descargar o procesar la URL proporcionada."""
+
+    def __init__(self):
+        super().__init__(
+            message=(
+                "No se pudo acceder a la página web. "
+                "Es posible que el sitio web tenga restricciones de seguridad "
+                "(como redes sociales o portales protegidos) que bloquean las "
+                "solicitudes automáticas. Intenta con un enlace de términos o "
+                "políticas público y accesible."
+            ),
+            error_code="URL_EXTRACTION_FAILED",
+        )

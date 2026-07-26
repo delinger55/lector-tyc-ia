@@ -529,6 +529,17 @@ body {
     flex-shrink: 0;
 }
 
+.error-banner strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.error-detail {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    line-height: 1.45;
+}
+
 /* Processing */
 .processing-container {
     text-align: center;
